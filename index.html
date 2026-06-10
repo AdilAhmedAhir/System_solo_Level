@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="THE SYSTEM — Solo Leveling Life OS. A gamified personal leveling system inspired by Solo Leveling.">
+  <meta name="theme-color" content="#080c18">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>THE SYSTEM — Solo Leveling Life OS</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/system.css">
+</head>
+<body>
+
+  <!-- Particle Background -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ══ Awakening Overlay ══ -->
+  <div id="awakening" class="awakening-overlay">
+    <div class="aw-line"></div>
+    <div class="aw-step aw-s1"><span>[ SYSTEM NOTIFICATION ]</span></div>
+    <div class="aw-step aw-s2"><span>A player has been detected.</span></div>
+    <div class="aw-step aw-s3"><span>Initiating System Protocol...</span></div>
+    <div class="aw-step aw-s3">
+      <div class="aw-bar-wrap"><div class="aw-bar-fill"></div></div>
+    </div>
+    <div class="aw-name-section">
+      <div class="aw-prompt">Enter your designation, Player.</div>
+      <input id="awNameInput" class="aw-name-input" type="text" placeholder="Hunter" maxlength="24" autocomplete="off">
+      <div><button id="awConfirm" class="btn pri aw-confirm">CONFIRM</button></div>
+    </div>
+    <div class="aw-stats-reveal" id="awStats"></div>
+    <div class="aw-complete" id="awComplete">System installation complete.</div>
+    <div class="aw-arise" id="awArise">A R I S E .</div>
+  </div>
+
+  <!-- ══ Main Application ══ -->
+  <div class="wrap">
+
+    <!-- ── Hero ── -->
+    <section class="hero">
+      <div class="hero-top">
+        <div id="rankBadge" class="rankbadge" style="--rank-color:#6b7280">
+          <span id="rankR" class="rank-letter">E</span>
+        </div>
+        <div>
+          <div class="hero-tag">THE SYSTEM</div>
+          <input id="pname" class="hero-name" type="text" value="Hunter" maxlength="24" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><span id="hLevel" class="hs-val mono">6</span><span class="hs-lbl">Level</span></div>
+        <div class="hero-stat"><span id="hXp" class="hs-val mono">0</span><span class="hs-lbl">Total XP</span></div>
+        <div class="hero-stat"><span id="hStreak" class="hs-val mono">0</span><span class="hs-lbl">Streak</span></div>
+        <div class="hero-stat"><span id="hBest" class="hs-val mono">0</span><span class="hs-lbl">Best</span></div>
+        <div class="hero-stat"><span id="hShadows" class="hs-val mono">0</span><span class="hs-lbl">Shadows</span></div>
+        <div class="hero-stat"><span id="hTitle" class="hs-val" style="font-size:0.8rem">Player</span><span class="hs-lbl">Title</span></div>
+      </div>
+
+      <div id="penaltyTimer" class="penalty-timer"></div>
+
+      <div id="syncBar" class="sync-bar">
+        <span id="syncDot" class="sync-dot"></span>
+        <span id="syncMsg">Local</span>
+        <span id="syncCtl"></span>
+      </div>
+
+      <div id="alert" class="alert"></div>
+    </section>
+
+    <!-- ── Grid ── -->
+    <div class="grid">
+      <!-- Left Column -->
+      <div>
+        <!-- Quests -->
+        <div class="card">
+          <div class="quest-header">
+            <h2><span class="icon">⚔️</span> Daily Quests</h2>
+            <div class="flex gap-sm">
+              <button id="editToggle" class="btn sm gho" data-act="editmode">✏️ Edit</button>
+              <button id="addQuest" class="btn sm pri" data-act="addquest">+ Quest</button>
+            </div>
+          </div>
+          <div class="quest-ring-wrap">
+            <canvas id="questRing" width="60" height="60"></canvas>
+            <div class="quest-ring-info">
+              <div id="questPct" class="quest-pct">0%</div>
+              <div id="qSub" class="quest-sub">0 / 0 cleared</div>
+            </div>
+          </div>
+          <div id="quests"></div>
+          <div class="mt-sm">
+            <button id="clearDay" class="btn sm danger" data-act="clearday">↩ Reset Today</button>
+          </div>
+          <div id="editHint">Tap ✏️ on items to edit or delete.</div>
+        </div>
+
+        <!-- Boss Fights -->
+        <div class="card">
+          <div class="quest-header">
+            <h2><span class="icon">👹</span> Boss Fights</h2>
+            <button id="addBoss" class="btn sm pri" data-act="addboss">+ Boss</button>
+          </div>
+          <div id="bosses"></div>
+        </div>
+
+        <!-- Shadow Army -->
+        <div class="card">
+          <h2><span class="icon">👤</span> Shadow Army</h2>
+          <div id="shadows"></div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- Stats + Radar -->
+        <div class="card">
+          <h2><span class="icon">📊</span> Hunter Stats</h2>
+          <div style="display:flex;justify-content:center;margin-bottom:14px;">
+            <canvas id="radarChart" width="280" height="280"></canvas>
+          </div>
+          <div id="stats"></div>
+          <button id="addStat" class="btn sm gho mt-sm qedit" data-act="addstat">+ Stat</button>
+        </div>
+
+        <!-- Achievements -->
+        <div class="card">
+          <h2><span class="icon">🏆</span> Achievements</h2>
+          <div id="achievements"></div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="card">
+          <h2><span class="icon">📈</span> Analytics</h2>
+          <canvas id="weeklyChart" width="400" height="180" style="width:100%;height:auto;"></canvas>
+          <div id="heatmap" class="mt-md"></div>
+        </div>
+
+        <!-- Daily Log -->
+        <div class="card">
+          <h2><span class="icon">📜</span> Daily Log</h2>
+          <div id="log"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="foot">
+      <a href="#" id="exportBtn">📦 Export Backup</a>
+      <a href="#" id="importBtn">📥 Import</a>
+      <input type="file" id="importFile" accept=".json" style="display:none">
+      <a href="#" id="resetAll">🗑️ Reset All</a>
+      <span id="installWrap"> | <button id="installBtn" class="btn sm pri">Install App</button></span>
+    </footer>
+
+  </div>
+
+  <!-- ══ Level Up Overlay ══ -->
+  <div id="levelUpOverlay" class="levelup-overlay">
+    <div id="levelUpText" class="lu-text">LEVEL UP</div>
+    <div class="lu-sub" id="levelUpSub"></div>
+  </div>
+
+  <!-- ══ Modal ══ -->
+  <div id="ov" class="ov">
+    <div class="modal">
+      <h3 id="mTitle">Modal</h3>
+      <div id="mBody"></div>
+      <div class="modal-actions">
+        <button id="mCancel" class="btn gho">Cancel</button>
+        <button id="mSave" class="btn pri">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Toast ══ -->
+  <div id="toast" class="toast"></div>
+
+  <!-- ══ Scripts ══ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/interactions.js"></script>
+</body>
+</html>
