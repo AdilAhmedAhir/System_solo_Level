@@ -60,6 +60,84 @@
     const id = btn.dataset.id;
 
     switch (act) {
+      /* ── AI System Terminal ──────────────────────────── */
+      case 'aisetkey': {
+        modal('System AI Setting', `
+          <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Enter your free Google Gemini API Key to enable AI task generation.</div>
+          <div class="fld"><label>Gemini API Key</label><input id="mApiKey" type="password" value="${window.AI ? window.AI.getKey() : ''}" placeholder="AIzaSy..."></div>
+        `, () => {
+          if (window.AI) window.AI.setKey(Engine.$('mApiKey').value);
+          Engine.toast('🔑 System Admin Key updated');
+        });
+        break;
+      }
+
+      case 'aigenerate': {
+        if (!window.AI || !window.AI.hasKey()) {
+          Engine.toast('❌ API Key required. Click "API Key" to set it.');
+          return;
+        }
+        
+        const goal = Engine.$('aiGoal').value.trim();
+        const deadline = Engine.$('aiDeadline').value.trim() || '7d';
+        
+        if (!goal) {
+          Engine.toast('❌ Enter a Raid goal first.');
+          return;
+        }
+
+        const loading = Engine.$('aiLoading');
+        loading.style.display = 'block';
+        Engine.$('aiGenerateBtn').disabled = true;
+
+        window.AI.generateQuests(goal, deadline).then(quests => {
+          loading.style.display = 'none';
+          Engine.$('aiGenerateBtn').disabled = false;
+          
+          if (!Array.isArray(quests) || quests.length === 0) throw new Error('Invalid AI response');
+
+          // Create the Boss/Raid
+          const raidId = Engine.uid();
+          const mainStat = quests[0]?.stat || 'int';
+          
+          Engine.S.bosses.unshift({
+            id: raidId,
+            name: goal,
+            stat: mainStat,
+            deadline: deadline,
+            progress: 0,
+            reward: '+' + (quests.length * 50) + ' ' + mainStat.toUpperCase() + ' XP',
+            done: false
+          });
+
+          // Create the associated quests
+          quests.forEach(q => {
+            Engine.S.quests.unshift({
+              id: Engine.uid(),
+              name: '[RAID] ' + q.name,
+              stat: q.stat || 'int',
+              xp: q.xp || 25,
+              done: false
+            });
+          });
+
+          Engine.$('aiGoal').value = '';
+          Engine.$('aiDeadline').value = '';
+          
+          Engine.save();
+          Render.render();
+          Engine.toast('⚡ Raid generated successfully!');
+          window.Sync?.push?.();
+
+        }).catch(err => {
+          loading.style.display = 'none';
+          Engine.$('aiGenerateBtn').disabled = false;
+          Engine.toast('❌ ' + err.message);
+        });
+
+        break;
+      }
+
       /* ── Toggle Quest ────────────────────────────────── */
       case 'tquest': {
         const q = Engine.S.quests.find(q => q.id === id);

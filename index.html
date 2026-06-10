@@ -97,6 +97,21 @@
           <div id="editHint">Tap ✏️ on items to edit or delete.</div>
         </div>
 
+        <!-- AI System Terminal (Raid Generation) -->
+        <div class="card" id="aiTerminal">
+          <div class="quest-header">
+            <h2><span class="icon">🔮</span> System Terminal</h2>
+            <button id="aiSetKey" class="btn sm gho" data-act="aisetkey">🔑 API Key</button>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px;">Ask The System to generate a Raid and break it down into quests.</div>
+          <div class="fld">
+            <input type="text" id="aiGoal" placeholder="e.g. Launch marketing campaign" style="margin-bottom: 8px;">
+            <input type="text" id="aiDeadline" placeholder="Deadline (e.g. Friday, 90d)" style="margin-bottom: 8px;">
+          </div>
+          <button id="aiGenerateBtn" class="btn pri" style="width: 100%; justify-content: center;" data-act="aigenerate">⚡ GENERATE RAID</button>
+          <div id="aiLoading" style="display:none; text-align:center; font-family:var(--font-system); font-size:0.8rem; color:var(--cyan); margin-top:10px; animation:blink 1s infinite;">System Analyzing...</div>
+        </div>
+
         <!-- Boss Fights -->
         <div class="card">
           <div class="quest-header">
@@ -152,6 +167,7 @@
       <a href="#" id="importBtn">📥 Import</a>
       <input type="file" id="importFile" accept=".json" style="display:none">
       <a href="#" id="resetAll">🗑️ Reset All</a>
+      <a href="#" id="apiSetBtn" data-act="aisetkey">⚙️ AI Settings</a>
       <span id="installWrap"> | <button id="installBtn" class="btn sm pri">Install App</button></span>
     </footer>
 
@@ -182,6 +198,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
   <script src="js/achievements.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/particles.js"></script>
